@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pengumuman Hasil Ujian</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f2f4f7;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.1);
+      max-width: 420px;
+      margin: auto;
+      text-align: center;
+    }
+    img {
+      max-width: 100px;
+      margin-bottom: 10px;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    select, input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    button {
+      background: #1e88e5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+    .hasil {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 6px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <!-- Logo Sekolah -->
+  <img src="logo.png" alt="Logo Sekolah">
+
+  <h2>Cek Nilai Ujian Kamu</h2>
+
+  <!-- Dropdown Nama -->
+  <select id="nama">
+    <option value="">-- Pilih Nama --</option>
+  </select>
+
+  <!-- PIN -->
+  <input type="password" id="pin" placeholder="Password">
+
+  <button onclick="cekHasil()">Login</button>
+
+  <div id="hasil" class="hasil"></div>
+</div>
+
+<script>
+let dataUjian = [];
+
+fetch('data.json')
+  .then(res => res.json())
+  .then(data => {
+    dataUjian = data;
+    const select = document.getElementById('nama');
+
+    data.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.nama;
+      opt.textContent = s.nama;
+      select.appendChild(opt);
+    });
+  });
+
+function cekHasil() {
+  const nama = document.getElementById('nama').value;
+  const pin  = document.getElementById('pin').value.trim();
+  const hasilDiv = document.getElementById('hasil');
+
+  if (!nama || !pin) {
+    hasilDiv.innerHTML = "<b>Nama dan password wajib diisi.</b>";
+    return;
+  }
+
+  const siswa = dataUjian.find(
+    s => s.nama === nama && s.pin === pin
+  );
+
+  if (!siswa) {
+    hasilDiv.innerHTML = "<b>Data tidak ditemukan. Cek kembali password.</b>";
+    return;
+  }
+
+  hasilDiv.innerHTML = `
+    <p><b>${siswa.nama}</b></p>
+    <div class="row"><span>Bahasa Indonesia</span><span>${siswa.bindo}</span></div>
+    <div class="row"><span>Matematika</span><span>${siswa.mtk}</span></div>
+    <div class="row"><span>Bahasa Inggris</span><span>${siswa.bing}</span></div>
+    <div class="row"><span>${siswa.mapel1}</span><span>${siswa.nilai1}</span></div>
+    <div class="row"><span>${siswa.mapel2}</span><span>${siswa.nilai2}</span></div>
+  `;
+}
+</script>
+
+</body>
+</html>
